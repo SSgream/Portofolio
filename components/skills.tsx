@@ -1,19 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
 
-const skills = [
-  "React",
-  "Next.js",
-  "TypeScript",
-  "Tailwind CSS",
-  "Supabase",
-  "Node.js",
-  "PostgreSQL",
-  "Figma",
-];
+interface Skill {
+  id: string;
+  name: string;
+  level: string;
+  icon: string;
+}
 
 export default function Skills() {
+  const [skills, setSkills] = useState<Skill[]>([]);
+
+  useEffect(() => {
+    fetchSkills();
+  }, []);
+
+  async function fetchSkills() {
+    const { data, error } = await supabase
+      .from("skills")
+      .select("*")
+      .order("name", { ascending: true });
+
+    if (!error) {
+      setSkills(data || []);
+    }
+  }
+
   return (
     <section className="py-24 px-8 md:px-20 bg-black text-white">
       <motion.div
@@ -26,14 +41,24 @@ export default function Skills() {
           My <span className="text-purple-500">Tech Stack</span>
         </h2>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {skills.map((skill, index) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {skills.map((skill) => (
             <motion.div
-              key={index}
-              whileHover={{ scale: 1.1 }}
-              className="bg-[#111122] p-6 rounded-xl text-center font-medium hover:shadow-lg hover:shadow-purple-500/20 transition"
+              key={skill.id}
+              whileHover={{ scale: 1.07 }}
+              transition={{ duration: 0.3 }}
+              className="bg-[#111122] border border-gray-800 p-6 rounded-2xl text-center hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 transition"
             >
-              {skill}
+
+              {/* Name */}
+              <h3 className="font-semibold text-lg">
+                {skill.name}
+              </h3>
+
+              {/* Level */}
+              <p className="text-sm text-purple-400 mt-2">
+                {skill.level}
+              </p>
             </motion.div>
           ))}
         </div>
